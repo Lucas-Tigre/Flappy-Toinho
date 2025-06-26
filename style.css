@@ -21,12 +21,12 @@ body {
   background: blue;
 }
 .pacman {
-  background-image: url("pacman.png");
+  background-image: url("https://lh3.googleusercontent.com/a-/ALV-UjXamOarjLn9osveIzdj3yptulODeGJlOvngeKPHFM3QD-16HCfL=s75-c");
   background-size: cover;
   border-radius: 50%;
 }
 .ghost {
-  background-image: url("ghost.png");
+  background-image: url("https://play-lh.googleusercontent.com/yDjaHCaOn_O89vnY7eOKH6ElEBtJrmN2CSI4yhiP1_GVC2zrxXWSFGxO0lt9-CU0mV4=w240-h480-rw");
   background-size: cover;
   border-radius: 50%;
 }
