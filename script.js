@@ -70,5 +70,29 @@ setInterval(() => {
       return newIndex >= 0 &&
         newIndex < cells.length &&
         !cells[newIndex].classList.contains('wall') &&
-        !cells[newIndex].clas
-        
+        !cells[newIndex].classList.contains('ghost');
+    });
+
+    let bestMove = ghostIndex;
+    let shortest = Infinity;
+    validMoves.forEach(dir => {
+      const newIndex = ghostIndex + dir;
+      const dx = Math.abs((newIndex % width) - (pacmanIndex % width));
+      const dy = Math.abs(Math.floor(newIndex / width) - Math.floor(pacmanIndex / width));
+      const distance = dx + dy;
+      if (distance < shortest) {
+        bestMove = newIndex;
+        shortest = distance;
+      }
+    });
+
+    cells[ghostIndices[idx]].classList.remove('ghost');
+    ghostIndices[idx] = bestMove;
+    cells[ghostIndices[idx]].classList.add('ghost');
+
+    if (ghostIndices[idx] === pacmanIndex) {
+      alert("Game Over! Um fantasma pegou você!");
+      location.reload();
+    }
+  });
+}, 400);
