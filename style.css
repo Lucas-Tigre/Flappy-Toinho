@@ -8,8 +8,8 @@ body {
 }
 .game-board {
   display: grid;
-  grid-template-columns: repeat(10, 30px);
-  grid-template-rows: repeat(10, 30px);
+  grid-template-columns: repeat(20, 30px);
+  grid-template-rows: repeat(20, 30px);
   gap: 2px;
 }
 .cell {
@@ -21,12 +21,13 @@ body {
   background: blue;
 }
 .pacman {
-  background-image: url("https://lh3.googleusercontent.com/a-/ALV-UjXamOarjLn9osveIzdj3yptulODeGJlOvngeKPHFM3QD-16HCfL=s75-c");
+  background-image: url("pacman.png");
   background-size: cover;
   border-radius: 50%;
 }
 .ghost {
-  background: red;
+  background-image: url("ghost.png");
+  background-size: cover;
   border-radius: 50%;
 }
 .dot {
@@ -44,5 +45,6 @@ body {
   left: 50%;
   transform: translate(-50%, -50%);
 }
+
 
 

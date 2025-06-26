@@ -1,17 +1,20 @@
 const board = document.getElementById('gameBoard');
-const width = 10;
-const layout = [
-  1,1,1,1,1,1,1,1,1,1,
-  1,0,0,0,0,0,0,0,0,1,
-  1,0,1,1,1,1,1,1,0,1,
-  1,0,0,0,0,0,0,1,0,1,
-  1,1,1,1,1,1,0,1,0,1,
-  1,0,0,0,0,1,0,1,0,1,
-  1,0,1,1,0,1,0,1,0,1,
-  1,0,1,0,0,0,0,1,0,1,
-  1,0,0,0,1,1,0,0,0,1,
-  1,1,1,1,1,1,1,1,1,1
-];
+const width = 20;
+const layout = [];
+const total = width * width;
+
+// Gera um layout com paredes nas bordas e espaço no meio
+for (let i = 0; i < total; i++) {
+  if (
+    i < width || i >= total - width || 
+    i % width === 0 || i % width === width - 1 || 
+    Math.random() < 0.1
+  ) {
+    layout.push(1); // parede
+  } else {
+    layout.push(0); // espaço
+  }
+}
 
 const cells = [];
 function createBoard() {
@@ -27,15 +30,15 @@ function createBoard() {
 createBoard();
 
 // Pac-Man
-let pacmanIndex = 11;
+let pacmanIndex = 22;
 cells[pacmanIndex].classList.remove('dot');
 cells[pacmanIndex].classList.add('pacman');
 
 // Fantasmas
-let ghostIndex = 88;
-cells[ghostIndex].classList.add('ghost');
+const ghostIndices = [358, 377, 382, 401, 438];
+ghostIndices.forEach(index => cells[index].classList.add('ghost'));
 
-// Movimento do Pac-Man
+// Pac-Man movimento
 document.addEventListener('keydown', e => {
   cells[pacmanIndex].classList.remove('pacman');
   switch(e.key) {
@@ -49,48 +52,23 @@ document.addEventListener('keydown', e => {
       if (pacmanIndex - width >= 0 && !cells[pacmanIndex - width].classList.contains('wall')) pacmanIndex -= width;
       break;
     case 'ArrowDown':
-      if (pacmanIndex + width < width * width && !cells[pacmanIndex + width].classList.contains('wall')) pacmanIndex += width;
+      if (pacmanIndex + width < cells.length && !cells[pacmanIndex + width].classList.contains('wall')) pacmanIndex += width;
       break;
   }
-
   if (cells[pacmanIndex].classList.contains('dot')) {
     cells[pacmanIndex].classList.remove('dot');
   }
-
   cells[pacmanIndex].classList.add('pacman');
 });
 
-// Movimento automático do fantasma
+// Movimento dos fantasmas (todos)
 setInterval(() => {
-  const directions = [-1, 1, -width, width];
-  const validMoves = directions.filter(dir => {
-    const newIndex = ghostIndex + dir;
-    return (
-      newIndex >= 0 &&
-      newIndex < cells.length &&
-      !cells[newIndex].classList.contains('wall')
-    );
-  });
-
-  // Simples lógica de perseguição
-  let bestMove = ghostIndex;
-  let shortest = Infinity;
-  validMoves.forEach(dir => {
-    const newIndex = ghostIndex + dir;
-    const distance = Math.abs(newIndex % width - pacmanIndex % width) + Math.abs(Math.floor(newIndex / width) - Math.floor(pacmanIndex / width));
-    if (distance < shortest) {
-      bestMove = newIndex;
-      shortest = distance;
-    }
-  });
-
-  cells[ghostIndex].classList.remove('ghost');
-  ghostIndex = bestMove;
-  cells[ghostIndex].classList.add('ghost');
-
-  if (ghostIndex === pacmanIndex) {
-    alert("Game Over! O fantasma pegou você!");
-    location.reload();
-  }
-}, 500);
-
+  ghostIndices.forEach((ghostIndex, idx) => {
+    const directions = [-1, 1, -width, width];
+    const validMoves = directions.filter(dir => {
+      const newIndex = ghostIndex + dir;
+      return newIndex >= 0 &&
+        newIndex < cells.length &&
+        !cells[newIndex].classList.contains('wall') &&
+        !cells[newIndex].clas
+        
