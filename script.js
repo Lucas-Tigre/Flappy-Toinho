@@ -1,98 +1,122 @@
-const board = document.getElementById('gameBoard');
+{
+    const board = document.getElementById('gameBoard');
 const width = 20;
-const layout = [];
-const total = width * width;
+const height = 20;
+const totalCells = width * height;
+const cells = [];
 
-// Gera um layout com paredes nas bordas e espaço no meio
-for (let i = 0; i < total; i++) {
-  if (
-    i < width || i >= total - width || 
-    i % width === 0 || i % width === width - 1 || 
-    Math.random() < 0.1
-  ) {
-    layout.push(1); // parede
-  } else {
-    layout.push(0); // espaço
-  }
 }
 
-const cells = [];
+const layout = Array.from({ length: totalCells }, (_, i) => {
+  const row = Math.floor(i / width);
+  const col = i % width;
+
+  if (
+    row === 0 || row === height - 1 ||
+    col === 0 || col === width - 1 ||
+    Math.random() < 0.07
+  ) return 1;
+  return 0;
+});
+
 function createBoard() {
-  for (let i = 0; i < layout.length; i++) {
+  for (let i = 0; i < totalCells; i++) {
     const cell = document.createElement('div');
     cell.classList.add('cell');
-    if (layout[i] === 1) cell.classList.add('wall');
-    else cell.classList.add('dot');
+    if (layout[i] === 1) {
+      cell.classList.add('wall');
+    } else {
+      cell.classList.add('dot');
+    }
     board.appendChild(cell);
     cells.push(cell);
   }
 }
 createBoard();
 
-// Pac-Man
-let pacmanIndex = 22;
+let pacmanIndex = width + 1;
 cells[pacmanIndex].classList.remove('dot');
 cells[pacmanIndex].classList.add('pacman');
 
-// Fantasmas
-const ghostIndices = [358, 377, 382, 401, 438];
-ghostIndices.forEach(index => cells[index].classList.add('ghost'));
-
-// Pac-Man movimento
 document.addEventListener('keydown', e => {
-  cells[pacmanIndex].classList.remove('pacman');
-  switch(e.key) {
-    case 'ArrowLeft':
-      if (pacmanIndex % width !== 0 && !cells[pacmanIndex - 1].classList.contains('wall')) pacmanIndex -= 1;
-      break;
-    case 'ArrowRight':
-      if (pacmanIndex % width < width - 1 && !cells[pacmanIndex + 1].classList.contains('wall')) pacmanIndex += 1;
-      break;
-    case 'ArrowUp':
-      if (pacmanIndex - width >= 0 && !cells[pacmanIndex - width].classList.contains('wall')) pacmanIndex -= width;
-      break;
-    case 'ArrowDown':
-      if (pacmanIndex + width < cells.length && !cells[pacmanIndex + width].classList.contains('wall')) pacmanIndex += width;
-      break;
+  let nextIndex = pacmanIndex;
+  switch (e.key) {
+    case 'ArrowUp': nextIndex -= width; break;
+    case 'ArrowDown': nextIndex += width; break;
+    case 'ArrowLeft': nextIndex -= 1; break;
+    case 'ArrowRight': nextIndex += 1; break;
+    default: return;
   }
-  if (cells[pacmanIndex].classList.contains('dot')) {
-    cells[pacmanIndex].classList.remove('dot');
+
+  if (
+    nextIndex >= 0 &&
+    nextIndex < totalCells &&
+    !cells[nextIndex].classList.contains('wall')
+  ) {
+    cells[pacmanIndex].classList.remove('pacman');
+    pacmanIndex = nextIndex;
+
+    if (cells[pacmanIndex].classList.contains('dot')) {
+      cells[pacmanIndex].classList.remove('dot');
+    }
+
+    cells[pacmanIndex].classList.add('pacman');
   }
-  cells[pacmanIndex].classList.add('pacman');
 });
 
-// Movimento dos fantasmas (todos)
-setInterval(() => {
-  ghostIndices.forEach((ghostIndex, idx) => {
+const ghostCount = 5;
+const ghosts = [];
+
+for (let i = 0; i < ghostCount; i++) {
+  let ghostIndex;
+  do {
+    ghostIndex = Math.floor(Math.random() * totalCells);
+  } while (
+    layout[ghostIndex] === 1 ||
+    ghostIndex === pacmanIndex ||
+    ghosts.includes(ghostIndex)
+  );
+
+  ghosts.push(ghostIndex);
+  cells[ghostIndex].classList.add('ghost');
+}
+
+function moveGhosts() {
+  for (let i = 0; i < ghosts.length; i++) {
+    let currentIndex = ghosts[i];
+    let bestMove = currentIndex;
+    let minDistance = Infinity;
+
     const directions = [-1, 1, -width, width];
-    const validMoves = directions.filter(dir => {
-      const newIndex = ghostIndex + dir;
-      return newIndex >= 0 &&
-        newIndex < cells.length &&
-        !cells[newIndex].classList.contains('wall') &&
-        !cells[newIndex].classList.contains('ghost');
-    });
 
-    let bestMove = ghostIndex;
-    let shortest = Infinity;
-    validMoves.forEach(dir => {
-      const newIndex = ghostIndex + dir;
-      const dx = Math.abs((newIndex % width) - (pacmanIndex % width));
-      const dy = Math.abs(Math.floor(newIndex / width) - Math.floor(pacmanIndex / width));
-      const distance = dx + dy;
-      if (distance < shortest) {
-        bestMove = newIndex;
-        shortest = distance;
+    for (let dir of directions) {
+      const next = currentIndex + dir;
+      if (
+        next >= 0 &&
+        next < totalCells &&
+        !cells[next].classList.contains('wall') &&
+        !cells[next].classList.contains('ghost')
+      ) {
+        const dx = next % width - pacmanIndex % width;
+        const dy = Math.floor(next / width) - Math.floor(pacmanIndex / width);
+        const distance = Math.abs(dx) + Math.abs(dy);
+
+        if (distance < minDistance) {
+          bestMove = next;
+          minDistance = distance;
+        }
       }
-    });
+    }
 
-    cells[ghostIndices[idx]].classList.remove('ghost');
-    ghostIndices[idx] = bestMove;
-    cells[ghostIndices[idx]].classList.add('ghost');
+    cells[currentIndex].classList.remove('ghost');
+    ghosts[i] = bestMove;
+    cells[bestMove].classList.add('ghost');
 
-    if (ghostIndices[idx] === pacmanIndex) {
-      alert("Game Over! Um fantasma pegou você!");
+    if (bestMove === pacmanIndex) {
+      alert("💀 Game Over! Um fantasma pegou você!");
       location.reload();
     }
-  });
-}, 400);
+  }
+}
+
+setInterval(moveGhosts, 500);
