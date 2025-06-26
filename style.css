@@ -8,13 +8,13 @@ body {
 }
 .game-board {
   display: grid;
-  grid-template-columns: repeat(20, 30px);
-  grid-template-rows: repeat(20, 30px);
+  grid-template-columns: repeat(30, 25px);
+  grid-template-rows: repeat(30, 25px);
   gap: 2px;
 }
 .cell {
-  width: 30px;
-  height: 30px;
+  width: 25px;
+  height: 25px;
   background: #111;
 }
 .wall {
@@ -36,8 +36,8 @@ body {
 }
 .dot::after {
   content: '';
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
   background: white;
   border-radius: 50%;
   position: absolute;
@@ -45,6 +45,7 @@ body {
   left: 50%;
   transform: translate(-50%, -50%);
 }
+
 
 
 

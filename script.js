@@ -1,22 +1,18 @@
-{
-    const board = document.getElementById('gameBoard');
-const width = 20;
-const height = 20;
+const board = document.getElementById('gameBoard');
+const width = 30;
+const height = 30;
 const totalCells = width * height;
 const cells = [];
-
-}
 
 const layout = Array.from({ length: totalCells }, (_, i) => {
   const row = Math.floor(i / width);
   const col = i % width;
-
   if (
     row === 0 || row === height - 1 ||
     col === 0 || col === width - 1 ||
-    Math.random() < 0.07
-  ) return 1;
-  return 0;
+    Math.random() < 0.08
+  ) return 1; // parede
+  return 0; // espaço
 });
 
 function createBoard() {
@@ -34,10 +30,12 @@ function createBoard() {
 }
 createBoard();
 
+// Pac-Man
 let pacmanIndex = width + 1;
 cells[pacmanIndex].classList.remove('dot');
 cells[pacmanIndex].classList.add('pacman');
 
+// Movimento do Pac-Man
 document.addEventListener('keydown', e => {
   let nextIndex = pacmanIndex;
   switch (e.key) {
@@ -64,6 +62,7 @@ document.addEventListener('keydown', e => {
   }
 });
 
+// Fantasmas
 const ghostCount = 5;
 const ghosts = [];
 
@@ -76,17 +75,16 @@ for (let i = 0; i < ghostCount; i++) {
     ghostIndex === pacmanIndex ||
     ghosts.includes(ghostIndex)
   );
-
   ghosts.push(ghostIndex);
   cells[ghostIndex].classList.add('ghost');
 }
 
+// Movimento dos Fantasmas
 function moveGhosts() {
   for (let i = 0; i < ghosts.length; i++) {
     let currentIndex = ghosts[i];
     let bestMove = currentIndex;
     let minDistance = Infinity;
-
     const directions = [-1, 1, -width, width];
 
     for (let dir of directions) {
@@ -100,7 +98,6 @@ function moveGhosts() {
         const dx = next % width - pacmanIndex % width;
         const dy = Math.floor(next / width) - Math.floor(pacmanIndex / width);
         const distance = Math.abs(dx) + Math.abs(dy);
-
         if (distance < minDistance) {
           bestMove = next;
           minDistance = distance;
@@ -120,3 +117,4 @@ function moveGhosts() {
 }
 
 setInterval(moveGhosts, 500);
+
